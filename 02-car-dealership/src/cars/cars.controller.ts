@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -10,7 +9,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { CarsService } from './cars.service';
-import { CreateCarDto } from './dtos/create-car.dto';
+import { CreateCarDto, PatchCarDto } from './dtos';
 
 @Controller('cars')
 export class CarsController {
@@ -29,13 +28,11 @@ export class CarsController {
 
   @Post()
   create(@Body() createCarDto: CreateCarDto) {
-    if (!createCarDto.brand || !createCarDto.model)
-      throw new BadRequestException('Brand and model are required');
-    return createCarDto;
+    return this.carsService.createCar(createCarDto);
   }
   @Patch(':id')
   updateCar(
-    @Body() payload: any,
+    @Body() patchCarDto: PatchCarDto,
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -44,11 +41,7 @@ export class CarsController {
     )
     id: string,
   ) {
-    return {
-      message: 'Car updated',
-      id,
-      payload,
-    };
+    return this.carsService.patchCar(id, patchCarDto);
   }
 
   @Delete(':id')
@@ -61,9 +54,6 @@ export class CarsController {
     )
     id: string,
   ) {
-    return {
-      message: 'Car deleted',
-      id,
-    };
+    return this.carsService.deleteCar(id);
   }
 }
